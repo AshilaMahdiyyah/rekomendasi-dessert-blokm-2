@@ -1,4 +1,3 @@
-
 from sklearn.metrics.pairwise import cosine_similarity
 import pandas as pd
 
@@ -11,7 +10,7 @@ def get_rekomendasi(menu, flavor, price, dine, rating, top_n=10):
     user_query = f"{menu} {flavor}"
     user_vec = tfidf.transform([user_query])
 
-    df = df_menu.copy()
+    df = pd.read_csv("dataset_final.csv")
 
     # =====================================================
     # 2. TF-IDF SIMILARITY
