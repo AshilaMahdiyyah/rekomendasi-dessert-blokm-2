@@ -1,4 +1,4 @@
-import pickle
+import joblib
 from sklearn.metrics.pairwise import cosine_similarity
 import pandas as pd
 
@@ -13,12 +13,9 @@ def get_rekomendasi(menu, flavor, price, dine, rating, top_n=10):
 
     df = pd.read_csv("dataset_final.csv")
 
-    with open("tfidf.pkl", "rb") as f:
-        tfidf = pickle.load(f)
+    tfidf = joblib.load("tfidf.pkl")
 
-    with open("item_profile.pkl", "rb") as f:
-        item_profile = pickle.load(f)
-
+    item_profile = joblib.load("item_profile.pkl")
     # =====================================================
     # 2. TF-IDF SIMILARITY
     # =====================================================
