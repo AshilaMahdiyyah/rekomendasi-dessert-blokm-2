@@ -1,7 +1,6 @@
+    import pandas as pd
     import joblib
     from sklearn.metrics.pairwise import cosine_similarity
-    import pandas as pd
-
 
     df = pd.read_csv("dataset_final.csv")
     
