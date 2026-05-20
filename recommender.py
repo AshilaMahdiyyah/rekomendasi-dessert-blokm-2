@@ -1,14 +1,14 @@
-    import pandas as pd
-    import joblib
-    from sklearn.metrics.pairwise import cosine_similarity
+import pandas as pd
+import joblib
+from sklearn.metrics.pairwise import cosine_similarity
 
-    df = pd.read_csv("dataset_final.csv")
+df = pd.read_csv("dataset_final.csv")
     
-    tfidf = joblib.load("tfidf.pkl")
+tfidf = joblib.load("tfidf.pkl")
 
-    item_profile = joblib.load("item_profile.pkl")
+item_profile = joblib.load("item_profile.pkl")
 
-    def get_rekomendasi(menu, flavor, price, dine, rating, top_n=10):
+def get_rekomendasi(menu, flavor, price, dine, rating, top_n=10):
 
     # =====================================================
     # 1. USER QUERY
