@@ -2,23 +2,30 @@ import pandas as pd
 import joblib
 from sklearn.metrics.pairwise import cosine_similarity
 
-df = pd.read_csv("dataset_final.csv")
-    
-tfidf = joblib.load("tfidf.pkl")
+# =====================================================
+# LOAD DATA & MODEL
+# =====================================================
 
+df_menu = pd.read_csv("dataset_final.csv")
+tfidf = joblib.load("tfidf.pkl")
 item_profile = joblib.load("item_profile.pkl")
+
+
+# =====================================================
+# FUNCTION
+# =====================================================
 
 def get_rekomendasi(menu, flavor, price, dine, rating, top_n=10):
 
     # =====================================================
     # 1. USER QUERY
     # =====================================================
-    
+
     user_query = f"{menu} {flavor}"
     user_vec = tfidf.transform([user_query])
 
-
     df = df_menu.copy()
+
     # =====================================================
     # 2. TF-IDF SIMILARITY
     # =====================================================
@@ -29,14 +36,11 @@ def get_rekomendasi(menu, flavor, price, dine, rating, top_n=10):
     ).flatten()
 
     # =====================================================
-    # 3. FEATURE SCORING (0-1 SCALE)
+    # 3. FEATURE SCORING
     # =====================================================
 
     df["rating_score"] = df["avgRating"] / 5.0
-
-    df["price_score"] = (
-        df["range_price"] == price
-    ).astype(int)
+    df["price_score"] = (df["range_price"] == price).astype(int)
 
     if dine == "both":
         df["dine_score"] = 1
@@ -46,7 +50,7 @@ def get_rekomendasi(menu, flavor, price, dine, rating, top_n=10):
         )
 
     # =====================================================
-    # 4. COMBINED SIMILARITY SCORE
+    # 4. COMBINED SCORE
     # =====================================================
 
     df["similarity"] = (
@@ -57,14 +61,10 @@ def get_rekomendasi(menu, flavor, price, dine, rating, top_n=10):
     ) / 4
 
     # =====================================================
-    # 5. FILTER OUT NON-RELEVANT ITEMS
+    # 5. FILTER
     # =====================================================
 
     df = df[df["tfidf_similarity"] > 0]
-
-    # =====================================================
-    # 6. FILTER FUNCTION
-    # =====================================================
 
     def apply_filter(df, use_price=True, use_dine=True, use_rating=True):
 
@@ -85,26 +85,19 @@ def get_rekomendasi(menu, flavor, price, dine, rating, top_n=10):
         return d
 
     # =====================================================
-    # 7. FALLBACK LEVELS
+    # 6. FALLBACK LEVELS
     # =====================================================
 
     levels = [
 
-        ({"use_price": True,  "use_dine": True,  "use_rating": True},
-         "Exact Match"),
-
-        ({"use_price": False, "use_dine": True,  "use_rating": True},
-         "Rekomendasi Alternatif Harga"),
-
-        ({"use_price": False, "use_dine": False, "use_rating": True},
-         "Rekomendasi Alternatif"),
-
-        ({"use_price": False, "use_dine": False, "use_rating": False},
-         "Menu Serupa"),
+        ({"use_price": True, "use_dine": True, "use_rating": True}, "Exact Match"),
+        ({"use_price": False, "use_dine": True, "use_rating": True}, "Rekomendasi Alternatif Harga"),
+        ({"use_price": False, "use_dine": False, "use_rating": True}, "Rekomendasi Alternatif"),
+        ({"use_price": False, "use_dine": False, "use_rating": False}, "Menu Serupa"),
     ]
 
     # =====================================================
-    # 8. BUILD RESULT (FALLBACK SYSTEM)
+    # 7. BUILD RESULT
     # =====================================================
 
     result = pd.DataFrame()
@@ -133,16 +126,14 @@ def get_rekomendasi(menu, flavor, price, dine, rating, top_n=10):
             break
 
     # =====================================================
-    # 9. HANDLE EMPTY RESULT
+    # 8. HANDLE EMPTY
     # =====================================================
 
     if result.empty:
-        return pd.DataFrame({
-            "message": ["Menu serupa tidak ditemukan"]
-        })
+        return pd.DataFrame({"message": ["Menu serupa tidak ditemukan"]})
 
     # =====================================================
-    # 10. FINAL OUTPUT
+    # 9. OUTPUT
     # =====================================================
 
     result = result.head(top_n).reset_index(drop=True)
