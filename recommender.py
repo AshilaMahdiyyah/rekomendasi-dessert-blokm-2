@@ -1,21 +1,25 @@
-import joblib
-from sklearn.metrics.pairwise import cosine_similarity
-import pandas as pd
+    import joblib
+    from sklearn.metrics.pairwise import cosine_similarity
+    import pandas as pd
 
-def get_rekomendasi(menu, flavor, price, dine, rating, top_n=10):
+
+    df = pd.read_csv("dataset_final.csv")
+    
+    tfidf = joblib.load("tfidf.pkl")
+
+    item_profile = joblib.load("item_profile.pkl")
+
+    def get_rekomendasi(menu, flavor, price, dine, rating, top_n=10):
 
     # =====================================================
     # 1. USER QUERY
     # =====================================================
-
+    
     user_query = f"{menu} {flavor}"
     user_vec = tfidf.transform([user_query])
 
-    df = pd.read_csv("dataset_final.csv")
 
-    tfidf = joblib.load("tfidf.pkl")
-
-    item_profile = joblib.load("item_profile.pkl")
+    df = df_menu.copy()
     # =====================================================
     # 2. TF-IDF SIMILARITY
     # =====================================================
